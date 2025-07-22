@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "antd": "^5.26.6",
+    "daisyui": "^5.0.46",
     "lodash": "^4.17.21",
     "next": "15.4.1",
     "next-auth": "^4.24.5",
