@@ -22,7 +22,8 @@ const mockMatches: Match[] = [
       { id: "p1", name: "Alice", state: "ready", image: "/next.svg", rank: 1, team: 1 },
       { id: "p2", name: "Bob", state: "standby", image: "/next.svg", rank: 2, team: 1 }
     ],
-    court: { id: "c1", name: "Court 1", status: "occupied" }
+    court: { id: "c1", name: "Court 1", status: "occupied" },
+    startTime: new Date(Date.now() - 30 * 60 * 1000) // Started 30 minutes ago
   },
   {
     id: "2",
@@ -39,48 +40,93 @@ const mockMatches: Match[] = [
       { id: "p3", name: "Carol", state: "ready", image: "/next.svg", rank: 3, team: 1 },
       { id: "p4", name: "Dave", state: "standby", image: "/next.svg", rank: 4, team: 2 }
     ],
-    court: { id: "c2", name: "Court 2", status: "available" }
+    court: { id: "c2", name: "Court 2", status: "available" },
+    startTime: new Date(Date.now() - 120 * 60 * 1000), // Started 2 hours ago
+    endTime: new Date(Date.now() - 60 * 60 * 1000), // Ended 1 hour ago
+    duration: 60,
+    winner: "Team 1"
+  },
+  {
+    id: "4",
+    name: "Morning Match 1",
+    status: "Ended",
+    players: [
+      { id: "p1", name: "Alice", state: "ready", image: "/next.svg", rank: 1, team: 1 },
+      { id: "p6", name: "Frank", state: "ready", image: "/next.svg", rank: 6, team: 2 }
+    ],
+    court: { id: "c1", name: "Court 1", status: "available" },
+    startTime: new Date(Date.now() - 6 * 60 * 60 * 1000), // Started 6 hours ago
+    endTime: new Date(Date.now() - 5 * 60 * 60 * 1000), // Ended 5 hours ago
+    duration: 45,
+    winner: "Alice"
+  },
+  {
+    id: "5",
+    name: "Morning Match 2",
+    status: "Ended",
+    players: [
+      { id: "p8", name: "Heidi", state: "ready", image: "/next.svg", rank: 8, team: 1 },
+      { id: "p16", name: "Paul", state: "ready", image: "/next.svg", rank: 16, team: 2 }
+    ],
+    court: { id: "c3", name: "Court 3", status: "available" },
+    startTime: new Date(Date.now() - 4 * 60 * 60 * 1000), // Started 4 hours ago
+    endTime: new Date(Date.now() - 3.5 * 60 * 60 * 1000), // Ended 3.5 hours ago
+    duration: 30,
+    winner: "Heidi"
+  },
+  {
+    id: "6",
+    name: "Early Match",
+    status: "Ended",
+    players: [
+      { id: "p11", name: "Ken", state: "ready", image: "/next.svg", rank: 11, team: 1 },
+      { id: "p21", name: "Uma", state: "ready", image: "/next.svg", rank: 21, team: 2 }
+    ],
+    court: { id: "c2", name: "Court 2", status: "available" },
+    startTime: new Date(Date.now() - 8 * 60 * 60 * 1000), // Started 8 hours ago
+    endTime: new Date(Date.now() - 7.5 * 60 * 60 * 1000), // Ended 7.5 hours ago
+    duration: 35,
+    winner: "Ken"
   }
 ]
 
 // Mock courts and players for admin view
 const mockCourts: Court[] = [
   { id: "c1", name: "Court 1", status: "occupied" },
-  { id: "c2", name: "Court 2", status: "occupied" },
+  { id: "c2", name: "Court 2", status: "available" },
   { id: "c3", name: "Court 3", status: "available" }
 ]
-// Update mockPlayers to include level
+// Update mockPlayers to include level and today's match count
 const mockPlayers: Player[] = [
   // Professional (red)
-  { id: "p1", name: "Alice", state: "ready", image: "/next.svg", rank: 1, team: 1, level: "Professional" },
-  { id: "p2", name: "Bob", state: "standby", image: "/next.svg", rank: 2, team: 1, level: "Professional" },
-  { id: "p3", name: "Carol", state: "ready", image: "/next.svg", rank: 3, team: 2, level: "Professional" },
-  { id: "p4", name: "Dave", state: "standby", image: "/next.svg", rank: 4, team: 2, level: "Professional" },
-  { id: "p5", name: "Eve", state: "ready", image: "/next.svg", rank: 5, team: 2, level: "Professional" },
-  // Sportship (orange)
-  { id: "p6", name: "Frank", state: "ready", image: "/next.svg", rank: 6, team: 1, level: "Sportship" },
-  { id: "p7", name: "Grace", state: "standby", image: "/next.svg", rank: 7, team: 1, level: "Sportship" },
-  { id: "p8", name: "Heidi", state: "ready", image: "/next.svg", rank: 8, team: 2, level: "Sportship" },
-  { id: "p9", name: "Ivan", state: "standby", image: "/next.svg", rank: 9, team: 2, level: "Sportship" },
-  { id: "p10", name: "Judy", state: "ready", image: "/next.svg", rank: 10, team: 2, level: "Sportship" },
+  { id: "p1", name: "Alice", state: "ready", image: "/next.svg", rank: 1, team: 1, level: "Professional", todayMatches: 2 },
+  { id: "p2", name: "Bob", state: "standby", image: "/next.svg", rank: 2, team: 1, level: "Professional", todayMatches: 0 },
+  { id: "p3", name: "Carol", state: "ready", image: "/next.svg", rank: 3, team: 2, level: "Professional", todayMatches: 1 },
+  { id: "p4", name: "Dave", state: "standby", image: "/next.svg", rank: 4, team: 2, level: "Professional", todayMatches: 1 },
+  { id: "p5", name: "Eve", state: "ready", image: "/next.svg", rank: 5, team: 2, level: "Professional", todayMatches: 0 },
   // Intermediate (green)
-  { id: "p11", name: "Ken", state: "ready", image: "/next.svg", rank: 11, team: 1, level: "Intermediate" },
-  { id: "p12", name: "Liam", state: "standby", image: "/next.svg", rank: 12, team: 1, level: "Intermediate" },
-  { id: "p13", name: "Mona", state: "ready", image: "/next.svg", rank: 13, team: 2, level: "Intermediate" },
-  { id: "p14", name: "Nina", state: "standby", image: "/next.svg", rank: 14, team: 2, level: "Intermediate" },
-  { id: "p15", name: "Oscar", state: "ready", image: "/next.svg", rank: 15, team: 2, level: "Intermediate" },
+  { id: "p6", name: "Frank", state: "ready", image: "/next.svg", rank: 6, team: 1, level: "Intermediate", todayMatches: 1 },
+  { id: "p7", name: "Grace", state: "standby", image: "/next.svg", rank: 7, team: 1, level: "Intermediate", todayMatches: 0 },
+  { id: "p8", name: "Heidi", state: "ready", image: "/next.svg", rank: 8, team: 2, level: "Intermediate", todayMatches: 1 },
+  { id: "p9", name: "Ivan", state: "standby", image: "/next.svg", rank: 9, team: 2, level: "Intermediate", todayMatches: 2 },
+  { id: "p10", name: "Judy", state: "ready", image: "/next.svg", rank: 10, team: 2, level: "Intermediate", todayMatches: 0 },
+  { id: "p11", name: "Ken", state: "ready", image: "/next.svg", rank: 11, team: 1, level: "Intermediate", todayMatches: 1 },
+  { id: "p12", name: "Liam", state: "standby", image: "/next.svg", rank: 12, team: 1, level: "Intermediate", todayMatches: 0 },
+  { id: "p13", name: "Mona", state: "ready", image: "/next.svg", rank: 13, team: 2, level: "Intermediate", todayMatches: 1 },
+  { id: "p14", name: "Nina", state: "standby", image: "/next.svg", rank: 14, team: 2, level: "Intermediate", todayMatches: 0 },
+  { id: "p15", name: "Oscar", state: "ready", image: "/next.svg", rank: 15, team: 2, level: "Intermediate", todayMatches: 0 },
   // Beginner (blue)
-  { id: "p16", name: "Paul", state: "ready", image: "/next.svg", rank: 16, team: 1, level: "Beginner" },
-  { id: "p17", name: "Quinn", state: "standby", image: "/next.svg", rank: 17, team: 1, level: "Beginner" },
-  { id: "p18", name: "Rita", state: "ready", image: "/next.svg", rank: 18, team: 2, level: "Beginner" },
-  { id: "p19", name: "Sam", state: "standby", image: "/next.svg", rank: 19, team: 2, level: "Beginner" },
-  { id: "p20", name: "Tina", state: "ready", image: "/next.svg", rank: 20, team: 2, level: "Beginner" },
+  { id: "p16", name: "Paul", state: "ready", image: "/next.svg", rank: 16, team: 1, level: "Beginner", todayMatches: 1 },
+  { id: "p17", name: "Quinn", state: "standby", image: "/next.svg", rank: 17, team: 1, level: "Beginner", todayMatches: 0 },
+  { id: "p18", name: "Rita", state: "ready", image: "/next.svg", rank: 18, team: 2, level: "Beginner", todayMatches: 0 },
+  { id: "p19", name: "Sam", state: "standby", image: "/next.svg", rank: 19, team: 2, level: "Beginner", todayMatches: 1 },
+  { id: "p20", name: "Tina", state: "ready", image: "/next.svg", rank: 20, team: 2, level: "Beginner", todayMatches: 0 },
   // Unknown (grey)
-  { id: "p21", name: "Uma", state: "ready", image: "/next.svg", rank: 21, team: 1, level: "Unknown" },
-  { id: "p22", name: "Vince", state: "standby", image: "/next.svg", rank: 22, team: 1, level: "Unknown" },
-  { id: "p23", name: "Wendy", state: "ready", image: "/next.svg", rank: 23, team: 2, level: "Unknown" },
-  { id: "p24", name: "Xander", state: "standby", image: "/next.svg", rank: 24, team: 2, level: "Unknown" },
-  { id: "p25", name: "Yara", state: "ready", image: "/next.svg", rank: 25, team: 2, level: "Unknown" },
+  { id: "p21", name: "Uma", state: "ready", image: "/next.svg", rank: 21, team: 1, level: "Unknown", todayMatches: 1 },
+  { id: "p22", name: "Vince", state: "standby", image: "/next.svg", rank: 22, team: 1, level: "Unknown", todayMatches: 0 },
+  { id: "p23", name: "Wendy", state: "ready", image: "/next.svg", rank: 23, team: 2, level: "Unknown", todayMatches: 0 },
+  { id: "p24", name: "Xander", state: "standby", image: "/next.svg", rank: 24, team: 2, level: "Unknown", todayMatches: 0 },
+  { id: "p25", name: "Yara", state: "ready", image: "/next.svg", rank: 25, team: 2, level: "Unknown", todayMatches: 0 },
 ]
 
 export default function Dashboard() {
@@ -126,6 +172,44 @@ export default function Dashboard() {
   const handleRemoveMatch = (matchId: string) => {
     setMatches(matches => matches.filter(m => m.id !== matchId))
   }
+
+  // Start match handler - changes status to Ongoing and stamps start time
+  const handleStartMatch = (matchId: string) => {
+    setMatches(matches => matches.map(m => {
+      if (m.id === matchId) {
+        // Set court status to occupied if there's a court assigned
+        if (m.court) {
+          setCourts(courts => courts.map(c => 
+            c.id === m.court!.id ? { ...c, status: "occupied" } : c
+          ))
+        }
+        return { ...m, status: "Ongoing", startTime: new Date() }
+      }
+      return m
+    }))
+  }
+  
+  // End match handler - changes status to Ended, stamps end time, and releases players and court
+  const handleEndMatch = (matchId: string) => {
+    setMatches(matches => matches.map(m => {
+      if (m.id === matchId) {
+        // Set court status back to available if there was a court assigned
+        if (m.court) {
+          setCourts(courts => courts.map(c => 
+            c.id === m.court!.id ? { ...c, status: "available" } : c
+          ))
+        }
+        return { 
+          ...m, 
+          status: "Ended", 
+          endTime: new Date(),
+          players: [], // Release all players back to available pool
+          court: null  // Release court back to available pool
+        }
+      }
+      return m
+    }))
+  }
   // Number of slots per team is now defined in MatchCard component
   // Add modal state for player selection
   const [playerModal, setPlayerModal] = useState<{ matchId: string, team: number, slotIdx: number } | null>(null)
@@ -133,9 +217,36 @@ export default function Dashboard() {
   // Add filter state for match status
   const [matchFilters, setMatchFilters] = useState<string[]>(['Pending', 'Ongoing'])
 
+  // Add filter state for player levels
+  const [playerFilters, setPlayerFilters] = useState<string[]>(['Professional', 'Intermediate', 'Beginner', 'Unknown'])
+  const [playerStateFilter, setPlayerStateFilter] = useState<string[]>(['ready', 'standby'])
+
   // Helper: available players (not in any match)
   const assignedPlayerIds = new Set(matches.flatMap(m => m.players.map(p => p.id)))
-  const availablePlayers = mockPlayers.filter(p => !assignedPlayerIds.has(p.id))
+  const availablePlayers = mockPlayers.filter(p => 
+    !assignedPlayerIds.has(p.id) && 
+    playerFilters.includes(p.level || 'Unknown') &&
+    playerStateFilter.includes(p.state)
+  )
+
+  // Group players by level
+  const playersByLevel = availablePlayers.reduce((acc, player) => {
+    const level = player.level || 'Unknown'
+    if (!acc[level]) acc[level] = []
+    acc[level].push(player)
+    return acc
+  }, {} as Record<string, Player[]>)
+
+  // Player statistics
+  const playerStats = {
+    total: availablePlayers.length,
+    ready: availablePlayers.filter(p => p.state === 'ready').length,
+    standby: availablePlayers.filter(p => p.state === 'standby').length,
+    byLevel: Object.entries(playersByLevel).map(([level, players]) => ({
+      level,
+      count: players.length
+    }))
+  }
 
   // Assign player from modal
   const handleSelectPlayer = (matchId: string, team: number, slotIdx: number, player: Player) => {
@@ -167,6 +278,11 @@ export default function Dashboard() {
 
   // Assign court from modal
   const handleSelectCourt = (matchId: string, court: Court) => {
+    // Set court status to occupied
+    setCourts(courts => courts.map(c => 
+      c.id === court.id ? { ...c, status: "occupied" } : c
+    ))
+    // Assign court to match
     setMatches(matches => matches.map(m => m.id === matchId ? { ...m, court } : m))
     setCourtModalMatchId(null)
   }
@@ -295,7 +411,17 @@ export default function Dashboard() {
               <MatchCard
                 key={match.id}
                 match={match}
-                onRemoveCourt={() => setMatches(matches => matches.map(m => m.id === match.id ? { ...m, court: null } : m))}
+                onRemoveCourt={() => {
+                  const currentMatch = matches.find(m => m.id === match.id)
+                  if (currentMatch?.court) {
+                    // Set court status back to available
+                    setCourts(courts => courts.map(c => 
+                      c.id === currentMatch.court!.id ? { ...c, status: "available" } : c
+                    ))
+                  }
+                  // Remove court from match
+                  setMatches(matches => matches.map(m => m.id === match.id ? { ...m, court: null } : m))
+                }}
                 onAddCourt={() => setCourtModalMatchId(match.id)}
                 onSelectPlayer={(team, slotIdx) => setPlayerModal({ matchId: match.id, team, slotIdx })}
                 onRemovePlayer={(playerId) => setMatches(matches => matches.map(m => 
@@ -304,26 +430,142 @@ export default function Dashboard() {
                     : m
                 ))}
                 onRemoveMatch={() => handleRemoveMatch(match.id)}
+                onStartMatch={() => handleStartMatch(match.id)}
+                onEndMatch={() => handleEndMatch(match.id)}
               />
             ))}
           </div>
         </div>
-        {/* Player List */}
+        {/* Enhanced Player List */}
         <div className="mb-8">
-          <h3 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3 animate-glow">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 text-indigo-600">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-            </svg>
-            Available Players
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {availablePlayers.map(player => (
-              <PlayerCard
-                key={player.id}
-                player={player}
-              />
-            ))}
+          <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
+            <h3 className="text-3xl font-bold text-slate-800 tracking-tight animate-glow flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-indigo-600">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+              </svg>
+              Available Players
+            </h3>
+            
+            {/* Player Statistics */}
+            <div className="flex items-center gap-4 text-sm">
+              <div className="bg-gradient-to-r from-indigo-100 to-blue-100 rounded-lg px-4 py-2 border border-indigo-200">
+                <span className="font-semibold text-indigo-700">Total: {playerStats.total}</span>
+              </div>
+              <div className="bg-gradient-to-r from-green-100 to-emerald-100 rounded-lg px-4 py-2 border border-green-200">
+                <span className="font-semibold text-green-700">Ready: {playerStats.ready}</span>
+              </div>
+              <div className="bg-gradient-to-r from-yellow-100 to-amber-100 rounded-lg px-4 py-2 border border-yellow-200">
+                <span className="font-semibold text-yellow-700">Standby: {playerStats.standby}</span>
+              </div>
+            </div>
           </div>
+          
+          {/* Player Filters */}
+          <div className="mb-6">
+            <div className="flex flex-wrap gap-4 items-center justify-between">
+              <div className="flex flex-wrap gap-2 items-center">
+                <span className="text-sm font-medium text-slate-600 mr-2">Filter by level:</span>
+                {['Professional', 'Intermediate', 'Beginner', 'Unknown'].map(level => (
+                  <button
+                    key={level}
+                    onClick={() => {
+                      setPlayerFilters(prev => 
+                        prev.includes(level) 
+                          ? prev.filter(l => l !== level)
+                          : [...prev, level]
+                      )
+                    }}
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 shadow-md ${
+                      playerFilters.includes(level)
+                        ? level === 'Professional' 
+                          ? 'bg-gradient-to-r from-red-500 to-red-600 text-white border border-red-300'
+                          : level === 'Intermediate'
+                          ? 'bg-gradient-to-r from-green-500 to-green-600 text-white border border-green-300'
+                          : level === 'Beginner'
+                          ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white border border-blue-300'
+                          : 'bg-gradient-to-r from-slate-500 to-slate-600 text-white border border-slate-300'
+                        : 'bg-white/50 text-slate-500 border border-slate-300 hover:bg-white/80'
+                    }`}
+                  >
+                    {level}
+                  </button>
+                ))}
+              </div>
+              
+              <div className="flex gap-2 items-center">
+                <span className="text-sm font-medium text-slate-600 mr-2">Status:</span>
+                {['ready', 'standby'].map(state => (
+                  <button
+                    key={state}
+                    onClick={() => {
+                      setPlayerStateFilter(prev => 
+                        prev.includes(state) 
+                          ? prev.filter(s => s !== state)
+                          : [...prev, state]
+                      )
+                    }}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 shadow-sm ${
+                      playerStateFilter.includes(state)
+                        ? state === 'ready'
+                          ? 'bg-green-100 text-green-700 border border-green-300'
+                          : 'bg-yellow-100 text-yellow-700 border border-yellow-300'
+                        : 'bg-white/50 text-slate-500 border border-slate-300 hover:bg-white/80'
+                    }`}
+                  >
+                    {state.charAt(0).toUpperCase() + state.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Players Grid */}
+          {availablePlayers.length > 0 ? (
+            <div className="space-y-8">
+              {Object.entries(playersByLevel)
+                .sort(([a], [b]) => {
+                  const order = ['Professional', 'Intermediate', 'Beginner', 'Unknown']
+                  return order.indexOf(a) - order.indexOf(b)
+                })
+                .map(([level, players]) => (
+                <div key={level} className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-lg font-semibold text-slate-700 flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${
+                        level === 'Professional' ? 'bg-red-500' :
+                        level === 'Intermediate' ? 'bg-green-500' :
+                        level === 'Beginner' ? 'bg-blue-500' : 'bg-slate-500'
+                      }`}></div>
+                      {level} Level
+                    </h4>
+                    <span className="text-sm text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
+                      {players.length} player{players.length !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    {players
+                      .map(player => (
+                        <PlayerCard
+                          key={player.id}
+                          player={player}
+                        />
+                      ))
+                    }
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 text-slate-400">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-slate-600 mb-2">No players available</h3>
+              <p className="text-slate-500">All players are currently assigned to matches or filtered out.</p>
+            </div>
+          )}
         </div>
         {/* Courts */}
         <div className="mb-8">

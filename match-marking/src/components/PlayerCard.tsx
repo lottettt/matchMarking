@@ -7,30 +7,52 @@ interface PlayerCardProps {
 }
 
 const getLevelColor = (level?: string) => {
-  if (level === "Professional") return "status-rejected"
-  if (level === "Sportship") return "status-pending"
-  if (level === "Intermediate") return "status-approved"
-  if (level === "Beginner") return "bg-gradient-to-r from-blue-400 to-blue-500 text-white border border-blue-300/30"
-  return "bg-gradient-to-r from-slate-300 to-slate-400 text-white border border-slate-300/30"
+  if (level === "Professional") return "bg-red-100 text-red-700 border-red-200 hover:bg-red-200"
+  if (level === "Intermediate") return "bg-green-100 text-green-700 border-green-200 hover:bg-green-200"
+  if (level === "Beginner") return "bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
+  return "bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200"
 }
 
-const PlayerCard: React.FC<PlayerCardProps> = ({ player, onRemove }) => (
-  <span className={`inline-flex items-center px-4 py-2.5 rounded-xl text-sm font-medium shadow-lg border transform transition-all duration-300 hover:scale-105 cursor-pointer w-full sm:w-auto justify-center btn-3d plan-cell ${getLevelColor(player.level)}`}>
-    <span className="font-bold mr-2 flex items-center gap-2">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-      </svg>
-      {player.name}
-    </span>
-    {onRemove && (
-      <button 
-        onClick={onRemove} 
-        className="ml-2 bg-white/20 text-current px-1.5 py-0.5 rounded-full text-xs font-medium hover:bg-white/30 transition-all duration-200"
-      >
-        ×
-      </button>
-    )}
-  </span>
-)
+const getStateIcon = (state: string) => {
+  return state === 'ready' 
+    ? { letter: 'R', bgColor: 'bg-green-500', textColor: 'text-white' }
+    : { letter: 'S', bgColor: 'bg-yellow-500', textColor: 'text-white' }
+}
+
+const PlayerCard: React.FC<PlayerCardProps> = ({ player, onRemove }) => {
+  const statusInfo = getStateIcon(player.state)
+  
+  return (
+    <div className={`p-4 rounded-xl border-2 transition-all duration-200 text-left hover:shadow-lg hover:scale-105 transform relative ${getLevelColor(player.level)}`}>
+      {/* Status badge in top right */}
+      <div className={`absolute top-2 right-2 w-6 h-6 ${statusInfo.bgColor} ${statusInfo.textColor} rounded-md flex items-center justify-center text-xs font-bold shadow-sm`}>
+        {statusInfo.letter}
+      </div>
+      
+      {/* Remove button */}
+      {onRemove && (
+        <button 
+          onClick={onRemove} 
+          className="absolute top-2 right-10 w-6 h-6 bg-white/80 hover:bg-white rounded-full flex items-center justify-center text-gray-600 hover:text-gray-800 transition-all duration-200 text-xs font-bold shadow-sm"
+          title="Remove player"
+        >
+          ×
+        </button>
+      )}
+      
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 bg-white/80 rounded-full flex items-center justify-center text-lg font-bold shadow-sm">
+          {player.name.charAt(0)}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="font-semibold text-sm truncate">{player.name}</div>
+          <div className="text-xs text-gray-600 mt-1">
+            Today: {player.todayMatches || 0} match{(player.todayMatches || 0) !== 1 ? 'es' : ''}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default PlayerCard 

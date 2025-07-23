@@ -1,5 +1,6 @@
 import React from 'react'
 import { Player, Match } from '../types'
+import { useMatchTimer } from '../hooks/useMatchTimer'
 
 interface MatchCardProps {
   match: Match
@@ -8,12 +9,13 @@ interface MatchCardProps {
   onSelectPlayer: (team: number, slotIdx: number, player: Player | null) => void
   onRemovePlayer: (playerId: string) => void
   onRemoveMatch: () => void
+  onStartMatch: () => void
+  onEndMatch: () => void
   TEAM_SIZE?: number
 }
 
 const getLevelColor = (level?: string) => {
   if (level === "Professional") return "status-rejected"
-  if (level === "Sportship") return "status-pending"
   if (level === "Intermediate") return "status-approved"
   if (level === "Beginner") return "bg-gradient-to-r from-blue-400 to-blue-500 text-white border border-blue-300/30"
   return "bg-gradient-to-r from-slate-300 to-slate-400 text-white border border-slate-300/30"
@@ -45,7 +47,7 @@ const getMatchCardBorderStyle = (status: string) => {
   }
 }
 
-const MatchCard: React.FC<MatchCardProps> = ({ match, onRemoveCourt, onAddCourt, onSelectPlayer, onRemovePlayer, onRemoveMatch, TEAM_SIZE = 2 }) => {
+const MatchCard: React.FC<MatchCardProps> = ({ match, onRemoveCourt, onAddCourt, onSelectPlayer, onRemovePlayer, onRemoveMatch, onStartMatch, onEndMatch, TEAM_SIZE = 2 }) => {
   // Get current date for display
   const currentDate = new Date().toLocaleDateString('en-US', { 
     weekday: 'short', 
@@ -53,6 +55,36 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onRemoveCourt, onAddCourt,
     month: 'short', 
     day: 'numeric' 
   })
+
+  // Use timer hook for time tracking
+  const { formatTime, getDuration } = useMatchTimer(match.startTime, match.endTime)
+
+  // Check if match can be started (has court and 4 players total)
+  const canStartMatch = match.court && match.players.length >= 4
+  
+  // Handle start match with validation
+  const handleStartMatch = () => {
+    if (match.status !== 'Pending') {
+      return // No response when state is not pending
+    }
+    if (!match.court) {
+      alert('Please assign a court before starting the match.')
+      return
+    }
+    if (match.players.length < 4) {
+      alert('Please add at least 4 players (2 per team) before starting the match.')
+      return
+    }
+    onStartMatch()
+  }
+
+  // Handle end match
+  const handleEndMatch = () => {
+    if (match.status !== 'Ongoing') {
+      return // No response when state is not ongoing
+    }
+    onEndMatch()
+  }
 
   return (
     <div className={`glass-card rounded-3xl p-8 shadow-2xl backdrop-blur-xl bg-white/80 min-h-[200px] border w-full transition-all duration-300 ${getMatchCardBorderStyle(match.status)} relative`}>
@@ -208,7 +240,7 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onRemoveCourt, onAddCourt,
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          Start: 10:00
+          Start: {formatTime(match.startTime)}
         </span>
       </div>
       <div className="flex flex-col gap-1 text-right">
@@ -216,24 +248,44 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onRemoveCourt, onAddCourt,
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m6-6a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          Duration: 60m
+          Duration: {getDuration()}
         </span>
         <span className="flex items-center gap-1">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          End: 11:00
+          End: {formatTime(match.endTime)}
         </span>
       </div>
     </div>
 
     <div className="flex gap-4 mt-6">
-      <button className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 rounded-xl font-semibold shadow-lg transition-all duration-300">
-        START
-      </button>
-      <button className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white py-3 rounded-xl font-semibold shadow-lg transition-all duration-300">
-        END
-      </button>
+      {match.status === 'Pending' && (
+        <button 
+          onClick={handleStartMatch}
+          disabled={!canStartMatch}
+          className={`flex-1 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 ${
+            canStartMatch
+              ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white cursor-pointer'
+              : 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-500 cursor-not-allowed'
+          }`}
+        >
+          START
+        </button>
+      )}
+      {match.status === 'Ongoing' && (
+        <button 
+          onClick={handleEndMatch}
+          className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-3 rounded-xl font-semibold shadow-lg transition-all duration-300"
+        >
+          END
+        </button>
+      )}
+      {match.status === 'Ended' && (
+        <div className="flex-1 bg-gradient-to-r from-gray-400 to-gray-500 text-white py-3 rounded-xl font-semibold shadow-lg text-center">
+          MATCH COMPLETED
+        </div>
+      )}
     </div>
   </div>
   )
