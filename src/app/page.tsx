@@ -1,8 +1,9 @@
+'use client'
+
 // Home dashboard for Match Marking. Shows welcome, active matches, 3D preview, and quick actions.
 import { useSession } from "next-auth/react"
-import { useRouter } from "next/router"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { Fragment } from "react"
 import Link from "next/link"
 
 // Import extracted components
@@ -13,7 +14,7 @@ import CourtModal from '@/components/CourtModal'
 import PlayerModal from '@/components/PlayerModal'
 import AddCourtModal from '@/components/AddCourtModal'
 import AddPlayerModal from '@/components/AddPlayerModal'
-import { Player, Court, Match } from '../types'
+import { Player, Court, Match } from '@/types'
 
 const mockMatches: Match[] = [
   {
@@ -25,7 +26,7 @@ const mockMatches: Match[] = [
       { id: "p007", name: "Mike Rodriguez", state: "ready", image: "/next.svg", rank: 7, team: 2, level: "Professional" }
     ],
     court: { id: "c001", name: "Center Court", status: "occupied" },
-    startTime: new Date(Date.now() - 25 * 60 * 1000) // Started 25 minutes ago
+    startTime: new Date('2025-07-24T16:15:00') // Started at 4:15 PM today
   },
   {
     id: "m002", 
@@ -38,7 +39,7 @@ const mockMatches: Match[] = [
       { id: "p015", name: "Alex Thompson", state: "ready", image: "/next.svg", rank: 15, team: 2, level: "Intermediate" }
     ],
     court: { id: "c002", name: "Court A", status: "occupied" },
-    startTime: new Date(Date.now() - 15 * 60 * 1000) // Started 15 minutes ago
+    startTime: new Date('2025-07-24T16:25:00') // Started at 4:25 PM today
   },
   {
     id: "m003",
@@ -63,8 +64,8 @@ const mockMatches: Match[] = [
     status: "Ended",
     players: [],
     court: null,
-    startTime: new Date(Date.now() - 3 * 60 * 60 * 1000), // Started 3 hours ago
-    endTime: new Date(Date.now() - 2 * 60 * 60 * 1000), // Ended 2 hours ago
+    startTime: new Date('2025-07-24T13:00:00'), // Started at 1:00 PM today
+    endTime: new Date('2025-07-24T14:00:00'), // Ended at 2:00 PM today
     duration: 58,
     winner: "David Kim"
   },
@@ -74,8 +75,8 @@ const mockMatches: Match[] = [
     status: "Ended",
     players: [],
     court: null,
-    startTime: new Date(Date.now() - 5 * 60 * 60 * 1000), // Started 5 hours ago
-    endTime: new Date(Date.now() - 4 * 60 * 60 * 1000), // Ended 4 hours ago
+    startTime: new Date('2025-07-24T11:00:00'), // Started at 11:00 AM today
+    endTime: new Date('2025-07-24T12:00:00'), // Ended at 12:00 PM today
     duration: 42,
     winner: "Team Red"
   },
@@ -85,8 +86,8 @@ const mockMatches: Match[] = [
     status: "Ended",
     players: [],
     court: null,
-    startTime: new Date(Date.now() - 6.5 * 60 * 60 * 1000), // Started 6.5 hours ago
-    endTime: new Date(Date.now() - 6 * 60 * 60 * 1000), // Ended 6 hours ago
+    startTime: new Date('2025-07-24T09:30:00'), // Started at 9:30 AM today
+    endTime: new Date('2025-07-24T10:00:00'), // Ended at 10:00 AM today
     duration: 28,
     winner: "Sophie Lee"
   }
@@ -94,35 +95,36 @@ const mockMatches: Match[] = [
 
 // Mock courts for the facility
 const mockCourts: Court[] = [
-  { id: "c001", name: "Center Court", status: "occupied" },
-  { id: "c002", name: "Court A", status: "occupied" },
-  { id: "c003", name: "Court B", status: "available" },
-  { id: "c004", name: "Court C", status: "available" },
-  { id: "c005", name: "Practice Court 1", status: "available" },
-  { id: "c006", name: "Practice Court 2", status: "available" }
+  { id: "c001", name: "Center Court", status: "occupied", timeAvailable: "3:30 PM", createdAt: new Date('2025-07-21T09:00:00') },
+  { id: "c002", name: "Court A", status: "occupied", timeAvailable: "2:45 PM", createdAt: new Date('2025-07-22T09:00:00') },
+  { id: "c003", name: "Court B", status: "available", timeAvailable: "Available Now", createdAt: new Date('2025-07-23T09:00:00') },
+  { id: "c004", name: "Court C", status: "available", timeAvailable: "Available Now", createdAt: new Date('2025-07-23T09:00:00') },
+  { id: "c005", name: "Practice Court 1", status: "available", timeAvailable: "Available Now", createdAt: new Date('2025-07-24T09:00:00') },
+  { id: "c006", name: "Practice Court 2", status: "available", timeAvailable: "Available Now", createdAt: new Date('2025-07-24T09:00:00') }
 ]
+
 // Professional and competitive players with realistic badminton/tennis data
 const mockPlayers: Player[] = [
   // Professional Level Players (Rank 1-8)
-  { id: "p001", name: "Sarah Chen", state: "ready", image: "/next.svg", rank: 1, level: "Professional", todayMatches: 1, lastPlayTime: new Date(Date.now() - 2 * 60 * 60 * 1000) }, // 2 hours ago
-  { id: "p002", name: "David Kim", state: "ready", image: "/next.svg", rank: 2, level: "Professional", todayMatches: 2, lastPlayTime: new Date(Date.now() - 2 * 60 * 60 * 1000) }, // 2 hours ago
+  { id: "p001", name: "Sarah Chen", state: "ready", image: "/next.svg", rank: 1, level: "Professional", todayMatches: 1, lastPlayTime: new Date('2025-07-24T14:00:00') }, // 2:00 PM today
+  { id: "p002", name: "David Kim", state: "ready", image: "/next.svg", rank: 2, level: "Professional", todayMatches: 2, lastPlayTime: new Date('2025-07-24T14:00:00') }, // 2:00 PM today
   { id: "p003", name: "Emma Wilson", state: "ready", image: "/next.svg", rank: 3, level: "Professional", todayMatches: 1 },
   { id: "p004", name: "James Park", state: "ready", image: "/next.svg", rank: 4, level: "Professional", todayMatches: 1 },
   { id: "p005", name: "Rachel Torres", state: "standby", image: "/next.svg", rank: 5, level: "Professional", todayMatches: 0 },
   { id: "p006", name: "Marcus Johnson", state: "ready", image: "/next.svg", rank: 6, level: "Professional", todayMatches: 0 },
   { id: "p007", name: "Mike Rodriguez", state: "ready", image: "/next.svg", rank: 7, level: "Professional", todayMatches: 1 },
-  { id: "p008", name: "Nina Petrov", state: "standby", image: "/next.svg", rank: 8, level: "Professional", todayMatches: 1, lastPlayTime: new Date(Date.now() - 5 * 60 * 60 * 1000) }, // 5 hours ago
+  { id: "p008", name: "Nina Petrov", state: "standby", image: "/next.svg", rank: 8, level: "Professional", todayMatches: 1, lastPlayTime: new Date('2025-07-24T11:00:00') }, // 11:00 AM today
 
   // Intermediate Level Players (Rank 9-18)
   { id: "p009", name: "Kevin Chang", state: "ready", image: "/next.svg", rank: 9, level: "Intermediate", todayMatches: 0 },
-  { id: "p010", name: "Sophie Lee", state: "ready", image: "/next.svg", rank: 10, level: "Intermediate", todayMatches: 1, lastPlayTime: new Date(Date.now() - 6 * 60 * 60 * 1000) }, // 6 hours ago  
+  { id: "p010", name: "Sophie Lee", state: "ready", image: "/next.svg", rank: 10, level: "Intermediate", todayMatches: 1, lastPlayTime: new Date('2025-07-24T10:00:00') }, // 10:00 AM today
   { id: "p011", name: "Carlos Martinez", state: "standby", image: "/next.svg", rank: 11, level: "Intermediate", todayMatches: 0 },
   { id: "p012", name: "Lisa Zhang", state: "ready", image: "/next.svg", rank: 12, level: "Intermediate", todayMatches: 1 },
   { id: "p013", name: "Ryan O'Connor", state: "ready", image: "/next.svg", rank: 13, level: "Intermediate", todayMatches: 0 },
-  { id: "p014", name: "Priya Sharma", state: "standby", image: "/next.svg", rank: 14, level: "Intermediate", todayMatches: 1, lastPlayTime: new Date(Date.now() - 4 * 60 * 60 * 1000) }, // 4 hours ago
+  { id: "p014", name: "Priya Sharma", state: "standby", image: "/next.svg", rank: 14, level: "Intermediate", todayMatches: 1, lastPlayTime: new Date('2025-07-24T12:00:00') }, // 12:00 PM today
   { id: "p015", name: "Alex Thompson", state: "ready", image: "/next.svg", rank: 15, level: "Intermediate", todayMatches: 1 },
   { id: "p016", name: "Maya Patel", state: "ready", image: "/next.svg", rank: 16, level: "Intermediate", todayMatches: 0 },
-  { id: "p017", name: "Jordan Smith", state: "standby", image: "/next.svg", rank: 17, level: "Intermediate", todayMatches: 2, lastPlayTime: new Date(Date.now() - 3 * 60 * 60 * 1000) }, // 3 hours ago
+  { id: "p017", name: "Jordan Smith", state: "standby", image: "/next.svg", rank: 17, level: "Intermediate", todayMatches: 2, lastPlayTime: new Date('2025-07-24T13:00:00') }, // 1:00 PM today
   { id: "p018", name: "Amanda Foster", state: "ready", image: "/next.svg", rank: 18, level: "Intermediate", todayMatches: 0 },
 
   // Beginner Level Players (Rank 19-26)
@@ -131,7 +133,7 @@ const mockPlayers: Player[] = [
   { id: "p021", name: "Jessica Brown", state: "standby", image: "/next.svg", rank: 21, level: "Beginner", todayMatches: 0 },
   { id: "p022", name: "Maria Garcia", state: "ready", image: "/next.svg", rank: 22, level: "Beginner", todayMatches: 1 },
   { id: "p023", name: "Daniel Miller", state: "ready", image: "/next.svg", rank: 23, level: "Beginner", todayMatches: 0 },
-  { id: "p024", name: "Ashley Davis", state: "standby", image: "/next.svg", rank: 24, level: "Beginner", todayMatches: 1, lastPlayTime: new Date(Date.now() - 7 * 60 * 60 * 1000) }, // 7 hours ago
+  { id: "p024", name: "Ashley Davis", state: "standby", image: "/next.svg", rank: 24, level: "Beginner", todayMatches: 1, lastPlayTime: new Date('2025-07-24T09:00:00') }, // 9:00 AM today
   { id: "p025", name: "Chris Wilson", state: "ready", image: "/next.svg", rank: 25, level: "Beginner", todayMatches: 0 },
   { id: "p026", name: "Lauren Moore", state: "ready", image: "/next.svg", rank: 26, level: "Beginner", todayMatches: 0 },
 
@@ -149,7 +151,7 @@ export default function Dashboard() {
   // Redirect to login if not authenticated
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.replace("/login")
+      router.push("/login")
     }
   }, [status, router])
 
@@ -170,8 +172,23 @@ export default function Dashboard() {
   
   // Handle court creation with custom name
   const handleCreateCourt = (name: string) => {
-    const newId = `c${String(courts.length + 1).padStart(3, '0')}`
-    setCourts([...courts, { id: newId, name: name, status: "available" }])
+    // Generate a unique ID by finding the highest existing ID number and adding 1
+    const existingIds = courts.map(c => {
+      const idNum = parseInt(c.id.replace('c', ''))
+      return isNaN(idNum) ? 0 : idNum
+    })
+    const maxId = Math.max(0, ...existingIds)
+    const newId = `c${String(maxId + 1).padStart(3, '0')}`
+    
+    const timeAvailable = "Available Now"
+    
+    setCourts([...courts, { 
+      id: newId, 
+      name: name, 
+      status: "available",
+      timeAvailable: timeAvailable,
+      createdAt: new Date()
+    }])
     setShowAddCourtModal(false)
   }
   
@@ -187,12 +204,29 @@ export default function Dashboard() {
   // State for Add Player Modal
   const [showAddPlayerModal, setShowAddPlayerModal] = useState(false)
   
+  // Debug: Check for duplicate match IDs and log them
+  useEffect(() => {
+    const matchIds = matches.map(m => m.id)
+    const duplicateIds = matchIds.filter((id, index) => matchIds.indexOf(id) !== index)
+    if (duplicateIds.length > 0) {
+      console.error('Duplicate match IDs found:', duplicateIds)
+      console.log('All match IDs:', matchIds)
+    }
+  }, [matches])
+  
   // Add new match handler
   const handleAddMatch = () => {
-    const newId = `m${String(matches.length + 1).padStart(3, '0')}`
+    // Generate a unique ID by finding the highest existing ID number and adding 1
+    const existingIds = matches.map(m => {
+      const idNum = parseInt(m.id.replace('m', ''))
+      return isNaN(idNum) ? 0 : idNum
+    })
+    const maxId = Math.max(0, ...existingIds)
+    const newId = `m${String(maxId + 1).padStart(3, '0')}`
+    
     setMatches([
       ...matches,
-      { id: newId, name: `New Match ${matches.length + 1}`, status: "Pending", players: [], court: null }
+      { id: newId, name: `New Match ${maxId + 1}`, status: "Pending", players: [], court: null }
     ])
   }
 
@@ -203,13 +237,20 @@ export default function Dashboard() {
   
   // Handle player creation with custom name and level
   const handleCreatePlayer = (name: string, level: string) => {
-    const newId = `p${String(players.length + 1).padStart(3, '0')}`
+    // Generate a unique ID by finding the highest existing ID number and adding 1
+    const existingIds = players.map(p => {
+      const idNum = parseInt(p.id.replace('p', ''))
+      return isNaN(idNum) ? 0 : idNum
+    })
+    const maxId = Math.max(0, ...existingIds)
+    const newId = `p${String(maxId + 1).padStart(3, '0')}`
+    
     const newPlayer: Player = {
       id: newId,
       name: name,
       state: "ready",
       image: "/next.svg",
-      rank: players.length + 1,
+      rank: maxId + 1,
       level: level,
       todayMatches: 0
     }
@@ -491,6 +532,8 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {matches
               .filter(match => matchFilters.includes(match.status))
+              // Remove any potential duplicates by ID
+              .filter((match, index, array) => array.findIndex(m => m.id === match.id) === index)
               .sort((a, b) => {
                 // Sort by status: Pending first, then Ongoing, then Ended
                 const statusOrder = { 'Pending': 0, 'Ongoing': 1, 'Ended': 2 }

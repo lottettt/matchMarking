@@ -1,5 +1,6 @@
 import React from 'react'
 import { Player } from '../types'
+import { getInitials } from '../lib/nameUtils'
 
 interface PlayerCardProps {
   player: Player
@@ -66,10 +67,10 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, onRemove }) => {
       
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-white/80 rounded-full flex items-center justify-center text-lg font-bold shadow-sm">
-          {player.name.charAt(0)}
+          {getInitials(player.name)}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="font-semibold text-sm truncate">{player.name}</div>
+          <div className="font-semibold text-sm truncate" title={player.name}>{player.name}</div>
           <div className="text-xs text-gray-600 mt-1 space-y-0.5">
             <div>Today: {player.todayMatches || 0} match{(player.todayMatches || 0) !== 1 ? 'es' : ''}</div>
             <div>Last play: {getLastPlayText(player.lastPlayTime)}</div>

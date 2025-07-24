@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react'
 
 export const useMatchTimer = (startTime?: Date, endTime?: Date) => {
-  const [currentTime, setCurrentTime] = useState(new Date())
+  const [currentTime, setCurrentTime] = useState<Date | null>(null)
 
   useEffect(() => {
+    // Initialize current time on client-side only
+    setCurrentTime(new Date())
+    
     if (startTime && !endTime) {
       const interval = setInterval(() => {
         setCurrentTime(new Date())
@@ -38,7 +41,7 @@ export const useMatchTimer = (startTime?: Date, endTime?: Date) => {
   }
 
   const getDuration = (): string => {
-    if (!startTime) return '--'
+    if (!startTime || !currentTime) return '--'
     
     const endTimeToUse = endTime || currentTime
     const duration = endTimeToUse.getTime() - startTime.getTime()

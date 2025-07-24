@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Player, Match } from '../types'
 import { useMatchTimer } from '../hooks/useMatchTimer'
+import ResponsivePlayerName from './ResponsivePlayerName'
 
 interface MatchCardProps {
   match: Match
@@ -48,13 +49,19 @@ const getMatchCardBorderStyle = (status: string) => {
 }
 
 const MatchCard: React.FC<MatchCardProps> = ({ match, onRemoveCourt, onAddCourt, onSelectPlayer, onRemovePlayer, onRemoveMatch, onStartMatch, onEndMatch, TEAM_SIZE = 2 }) => {
-  // Get current date for display
-  const currentDate = new Date().toLocaleDateString('en-US', { 
-    weekday: 'short', 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
-  })
+  // Client-side only state to prevent hydration mismatches
+  const [isClient, setIsClient] = useState(false)
+  const [currentDate, setCurrentDate] = useState('')
+
+  useEffect(() => {
+    setIsClient(true)
+    setCurrentDate(new Date().toLocaleDateString('en-US', { 
+      weekday: 'short', 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    }))
+  }, [])
 
   // Use timer hook for time tracking
   const { formatTime, getDuration } = useMatchTimer(match.startTime, match.endTime)
@@ -118,16 +125,17 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onRemoveCourt, onAddCourt,
         </span>
         <div className="flex gap-3 items-center flex-1">
           {match.court ? (
-            <span className="inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium shadow-lg transition-all duration-300 bg-gradient-to-r from-emerald-400 to-green-500 text-white border border-emerald-300/30">
-              <span className="font-bold mr-2">{match.court.name}</span>
-              {match.status === 'Pending' && (
+            <span className="inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium shadow-lg border transition-all duration-300 min-w-[120px] justify-between bg-gradient-to-r from-emerald-400 to-green-500 text-white border-emerald-300/30">
+              <span className="font-bold flex-1 text-left">{match.court.name}</span>
+              {match.status === 'Pending' ? (
                 <button 
                   onClick={onRemoveCourt} 
-                  className="ml-1 bg-white/20 text-current px-1.5 py-0.5 rounded-full text-xs font-medium hover:bg-white/30 transition-all duration-200"
-                  title="Remove court"
+                  className="ml-2 bg-white/20 text-current px-1.5 py-0.5 rounded-full text-xs font-medium hover:bg-white/30 transition-all duration-200 flex-shrink-0"
                 >
                   ×
                 </button>
+              ) : (
+                <span className="ml-2 w-6 flex-shrink-0"></span>
               )}
             </span>
           ) : (
@@ -159,15 +167,17 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onRemoveCourt, onAddCourt,
               const teamPlayers = match.players.filter(p => p.team === 1)
               const player = teamPlayers[idx]
               return player ? (
-                <span key={player.id} className={`inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium shadow-lg border transition-all duration-300 ${getLevelColor(player.level)}`}>
-                  <span className="font-bold mr-2">{player.name}</span>
-                  {match.status === 'Pending' && (
+                <span key={player.id} className={`inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium shadow-lg border transition-all duration-300 min-w-[120px] justify-between ${getLevelColor(player.level)}`}>
+                  <ResponsivePlayerName name={player.name} className="font-bold flex-1 text-left" maxLength={12} />
+                  {match.status === 'Pending' ? (
                     <button 
                       onClick={() => onRemovePlayer(player.id)} 
-                      className="ml-1 bg-white/20 text-current px-1.5 py-0.5 rounded-full text-xs font-medium hover:bg-white/30 transition-all duration-200"
+                      className="ml-2 bg-white/20 text-current px-1.5 py-0.5 rounded-full text-xs font-medium hover:bg-white/30 transition-all duration-200 flex-shrink-0"
                     >
                       ×
                     </button>
+                  ) : (
+                    <span className="ml-2 w-6 flex-shrink-0"></span>
                   )}
                 </span>
               ) : (
@@ -200,15 +210,17 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onRemoveCourt, onAddCourt,
               const teamPlayers = match.players.filter(p => p.team === 2)
               const player = teamPlayers[idx]
               return player ? (
-                <span key={player.id} className={`inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium shadow-lg border transition-all duration-300 ${getLevelColor(player.level)}`}>
-                  <span className="font-bold mr-2">{player.name}</span>
-                  {match.status === 'Pending' && (
+                <span key={player.id} className={`inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium shadow-lg border transition-all duration-300 min-w-[120px] justify-between ${getLevelColor(player.level)}`}>
+                  <ResponsivePlayerName name={player.name} className="font-bold flex-1 text-left" maxLength={12} />
+                  {match.status === 'Pending' ? (
                     <button 
                       onClick={() => onRemovePlayer(player.id)} 
-                      className="ml-1 bg-white/20 text-current px-1.5 py-0.5 rounded-full text-xs font-medium hover:bg-white/30 transition-all duration-200"
+                      className="ml-2 bg-white/20 text-current px-1.5 py-0.5 rounded-full text-xs font-medium hover:bg-white/30 transition-all duration-200 flex-shrink-0"
                     >
                       ×
                     </button>
+                  ) : (
+                    <span className="ml-2 w-6 flex-shrink-0"></span>
                   )}
                 </span>
               ) : (
@@ -234,13 +246,13 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onRemoveCourt, onAddCourt,
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5a2.25 2.25 0 002.25-2.25m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5a2.25 2.25 0 012.25 2.25v7.5" />
           </svg>
-          {currentDate}
+          {isClient ? currentDate : '...'}
         </span>
         <span className="flex items-center gap-1">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          Start: {formatTime(match.startTime)}
+          Start: {isClient ? formatTime(match.startTime) : '--:--'}
         </span>
       </div>
       <div className="flex flex-col gap-1 text-right">
@@ -248,13 +260,13 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onRemoveCourt, onAddCourt,
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m6-6a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          Duration: {getDuration()}
+          Duration: {isClient ? getDuration() : '--'}
         </span>
         <span className="flex items-center gap-1">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          End: {formatTime(match.endTime)}
+          End: {isClient ? formatTime(match.endTime) : '--:--'}
         </span>
       </div>
     </div>

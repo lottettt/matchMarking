@@ -1,12 +1,14 @@
+'use client'
+
 // Login page with Gmail OAuth using next-auth. Clean, modern, immersive UI with white background and branding.
 import { useState } from "react"
 import { signIn, useSession } from "next-auth/react"
-import { useRouter } from "next/router"
+import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import Image from "next/image"
 
 export default function Login() {
-  const { data: session, status } = useSession()
+  const { status } = useSession()
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -16,7 +18,7 @@ export default function Login() {
   // Redirect to home if already logged in
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace("/")
+      router.push("/")
     }
   }, [status, router])
 
@@ -33,7 +35,7 @@ export default function Login() {
     if (res?.error) {
       setError("Invalid email or password")
     } else if (res?.ok) {
-      router.replace("/")
+      router.push("/")
     }
   }
 
@@ -98,24 +100,12 @@ export default function Login() {
             <path d="M12.805 21.1c2.32 0 4.27-.77 5.7-2.09l-2.63-2.22c-.73.62-1.72.99-3.07.99-2.36 0-4.36-1.6-5.07-3.76l-3.25 2.5c1.47 2.47 4 4.08 6.98 4.08z" fill="#4CAF50"></path>
             <path d="M21.805 10.023h-9.52v3.955h5.465c-.21 1.06-.84 2.19-1.72 2.89l.01-.01 2.63 2.22c-.19.18 2.81-2.06 2.81-6.1 0-.6-.07-1.06-.16-1.49z" fill="#1976D2"></path>
           </svg>
-          Sign in with Google
+          Continue with Google
         </button>
-        <div className="text-xs text-gray-400 mt-6 text-center">
-          By signing in, you agree to our Terms of Service and Privacy Policy.
-        </div>
-        <div className="w-full text-center mt-4">
-          <a href="/register" className="text-blue-600 hover:underline text-sm font-medium">Don&apos;t have an account? Register</a>
-        </div>
+        <p className="text-xs text-gray-500 text-center mt-4 max-w-xs">
+          By continuing, you agree to our Terms of Service and Privacy Policy.
+        </p>
       </div>
-      <style jsx global>{`
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(24px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-          animation: fade-in 0.7s cubic-bezier(0.4,0,0.2,1) both;
-        }
-      `}</style>
     </div>
   )
-} 
+}
