@@ -22,6 +22,30 @@ const getStateIcon = (state: string) => {
 const PlayerCard: React.FC<PlayerCardProps> = ({ player, onRemove }) => {
   const statusInfo = getStateIcon(player.state)
   
+  // Calculate minutes since last play
+  const getLastPlayText = (lastPlayTime?: Date) => {
+    if (!lastPlayTime) return 'Never played'
+    
+    const now = new Date()
+    const diffMs = now.getTime() - lastPlayTime.getTime()
+    const diffMinutes = Math.floor(diffMs / (1000 * 60))
+    
+    if (diffMinutes < 1) return 'Just finished'
+    if (diffMinutes < 60) return `${diffMinutes} min ago`
+    
+    const diffHours = Math.floor(diffMinutes / 60)
+    const remainingMinutes = diffMinutes % 60
+    
+    if (diffHours < 24) {
+      return remainingMinutes > 0 
+        ? `${diffHours}h ${remainingMinutes}m ago`
+        : `${diffHours}h ago`
+    }
+    
+    const diffDays = Math.floor(diffHours / 24)
+    return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`
+  }
+  
   return (
     <div className={`p-4 rounded-xl border-2 transition-all duration-200 text-left hover:shadow-lg hover:scale-105 transform relative ${getLevelColor(player.level)}`}>
       {/* Status badge in top right */}
@@ -46,8 +70,9 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, onRemove }) => {
         </div>
         <div className="flex-1 min-w-0">
           <div className="font-semibold text-sm truncate">{player.name}</div>
-          <div className="text-xs text-gray-600 mt-1">
-            Today: {player.todayMatches || 0} match{(player.todayMatches || 0) !== 1 ? 'es' : ''}
+          <div className="text-xs text-gray-600 mt-1 space-y-0.5">
+            <div>Today: {player.todayMatches || 0} match{(player.todayMatches || 0) !== 1 ? 'es' : ''}</div>
+            <div>Last play: {getLastPlayText(player.lastPlayTime)}</div>
           </div>
         </div>
       </div>

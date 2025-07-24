@@ -7,6 +7,7 @@ export type Player = {
   team?: number; 
   level?: string;
   todayMatches?: number;
+  lastPlayTime?: Date; // When they last finished playing
 }
 
 export type Court = { id: string; name: string; status: string }

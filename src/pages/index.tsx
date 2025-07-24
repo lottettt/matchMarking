@@ -11,122 +11,135 @@ import PlayerCard from '@/components/PlayerCard'
 import CourtCard from '@/components/CourtCard'
 import CourtModal from '@/components/CourtModal'
 import PlayerModal from '@/components/PlayerModal'
+import AddCourtModal from '@/components/AddCourtModal'
+import AddPlayerModal from '@/components/AddPlayerModal'
 import { Player, Court, Match } from '../types'
 
 const mockMatches: Match[] = [
   {
-    id: "1",
-    name: "Court 1 Match",
+    id: "m001",
+    name: "Singles Championship - Quarter Final",
     status: "Ongoing",
     players: [
-      { id: "p1", name: "Alice", state: "ready", image: "/next.svg", rank: 1, team: 1 },
-      { id: "p2", name: "Bob", state: "standby", image: "/next.svg", rank: 2, team: 1 }
+      { id: "p001", name: "Sarah Chen", state: "ready", image: "/next.svg", rank: 1, team: 1, level: "Professional" },
+      { id: "p007", name: "Mike Rodriguez", state: "ready", image: "/next.svg", rank: 7, team: 2, level: "Professional" }
     ],
-    court: { id: "c1", name: "Court 1", status: "occupied" },
-    startTime: new Date(Date.now() - 30 * 60 * 1000) // Started 30 minutes ago
+    court: { id: "c001", name: "Center Court", status: "occupied" },
+    startTime: new Date(Date.now() - 25 * 60 * 1000) // Started 25 minutes ago
   },
   {
-    id: "2",
-    name: "Court 2 Match",
+    id: "m002", 
+    name: "Doubles Match - Team Alpha vs Beta",
+    status: "Ongoing",
+    players: [
+      { id: "p003", name: "Emma Wilson", state: "ready", image: "/next.svg", rank: 3, team: 1, level: "Intermediate" },
+      { id: "p004", name: "James Park", state: "ready", image: "/next.svg", rank: 4, team: 1, level: "Intermediate" },
+      { id: "p012", name: "Lisa Zhang", state: "ready", image: "/next.svg", rank: 12, team: 2, level: "Intermediate" },
+      { id: "p015", name: "Alex Thompson", state: "ready", image: "/next.svg", rank: 15, team: 2, level: "Intermediate" }
+    ],
+    court: { id: "c002", name: "Court A", status: "occupied" },
+    startTime: new Date(Date.now() - 15 * 60 * 1000) // Started 15 minutes ago
+  },
+  {
+    id: "m003",
+    name: "Beginner Tournament - Round 1",
+    status: "Pending",
+    players: [
+      { id: "p020", name: "Tom Anderson", state: "ready", image: "/next.svg", rank: 20, team: 1, level: "Beginner" },
+      { id: "p022", name: "Maria Garcia", state: "ready", image: "/next.svg", rank: 22, team: 2, level: "Beginner" }
+    ],
+    court: null
+  },
+  {
+    id: "m004",
+    name: "Mixed Doubles Practice",
     status: "Pending",
     players: [],
     court: null
   },
   {
-    id: "3",
-    name: "Court 3 Match",
+    id: "m005",
+    name: "Morning Singles Final",
     status: "Ended",
-    players: [
-      { id: "p3", name: "Carol", state: "ready", image: "/next.svg", rank: 3, team: 1 },
-      { id: "p4", name: "Dave", state: "standby", image: "/next.svg", rank: 4, team: 2 }
-    ],
-    court: { id: "c2", name: "Court 2", status: "available" },
-    startTime: new Date(Date.now() - 120 * 60 * 1000), // Started 2 hours ago
-    endTime: new Date(Date.now() - 60 * 60 * 1000), // Ended 1 hour ago
-    duration: 60,
-    winner: "Team 1"
+    players: [],
+    court: null,
+    startTime: new Date(Date.now() - 3 * 60 * 60 * 1000), // Started 3 hours ago
+    endTime: new Date(Date.now() - 2 * 60 * 60 * 1000), // Ended 2 hours ago
+    duration: 58,
+    winner: "David Kim"
   },
   {
-    id: "4",
-    name: "Morning Match 1",
+    id: "m006",
+    name: "Intermediate Doubles Championship",
     status: "Ended",
-    players: [
-      { id: "p1", name: "Alice", state: "ready", image: "/next.svg", rank: 1, team: 1 },
-      { id: "p6", name: "Frank", state: "ready", image: "/next.svg", rank: 6, team: 2 }
-    ],
-    court: { id: "c1", name: "Court 1", status: "available" },
-    startTime: new Date(Date.now() - 6 * 60 * 60 * 1000), // Started 6 hours ago
-    endTime: new Date(Date.now() - 5 * 60 * 60 * 1000), // Ended 5 hours ago
-    duration: 45,
-    winner: "Alice"
+    players: [],
+    court: null,
+    startTime: new Date(Date.now() - 5 * 60 * 60 * 1000), // Started 5 hours ago
+    endTime: new Date(Date.now() - 4 * 60 * 60 * 1000), // Ended 4 hours ago
+    duration: 42,
+    winner: "Team Red"
   },
   {
-    id: "5",
-    name: "Morning Match 2",
+    id: "m007",
+    name: "Junior Practice Match",
     status: "Ended",
-    players: [
-      { id: "p8", name: "Heidi", state: "ready", image: "/next.svg", rank: 8, team: 1 },
-      { id: "p16", name: "Paul", state: "ready", image: "/next.svg", rank: 16, team: 2 }
-    ],
-    court: { id: "c3", name: "Court 3", status: "available" },
-    startTime: new Date(Date.now() - 4 * 60 * 60 * 1000), // Started 4 hours ago
-    endTime: new Date(Date.now() - 3.5 * 60 * 60 * 1000), // Ended 3.5 hours ago
-    duration: 30,
-    winner: "Heidi"
-  },
-  {
-    id: "6",
-    name: "Early Match",
-    status: "Ended",
-    players: [
-      { id: "p11", name: "Ken", state: "ready", image: "/next.svg", rank: 11, team: 1 },
-      { id: "p21", name: "Uma", state: "ready", image: "/next.svg", rank: 21, team: 2 }
-    ],
-    court: { id: "c2", name: "Court 2", status: "available" },
-    startTime: new Date(Date.now() - 8 * 60 * 60 * 1000), // Started 8 hours ago
-    endTime: new Date(Date.now() - 7.5 * 60 * 60 * 1000), // Ended 7.5 hours ago
-    duration: 35,
-    winner: "Ken"
+    players: [],
+    court: null,
+    startTime: new Date(Date.now() - 6.5 * 60 * 60 * 1000), // Started 6.5 hours ago
+    endTime: new Date(Date.now() - 6 * 60 * 60 * 1000), // Ended 6 hours ago
+    duration: 28,
+    winner: "Sophie Lee"
   }
 ]
 
-// Mock courts and players for admin view
+// Mock courts for the facility
 const mockCourts: Court[] = [
-  { id: "c1", name: "Court 1", status: "occupied" },
-  { id: "c2", name: "Court 2", status: "available" },
-  { id: "c3", name: "Court 3", status: "available" }
+  { id: "c001", name: "Center Court", status: "occupied" },
+  { id: "c002", name: "Court A", status: "occupied" },
+  { id: "c003", name: "Court B", status: "available" },
+  { id: "c004", name: "Court C", status: "available" },
+  { id: "c005", name: "Practice Court 1", status: "available" },
+  { id: "c006", name: "Practice Court 2", status: "available" }
 ]
-// Update mockPlayers to include level and today's match count
+// Professional and competitive players with realistic badminton/tennis data
 const mockPlayers: Player[] = [
-  // Professional (red)
-  { id: "p1", name: "Alice", state: "ready", image: "/next.svg", rank: 1, team: 1, level: "Professional", todayMatches: 2 },
-  { id: "p2", name: "Bob", state: "standby", image: "/next.svg", rank: 2, team: 1, level: "Professional", todayMatches: 0 },
-  { id: "p3", name: "Carol", state: "ready", image: "/next.svg", rank: 3, team: 2, level: "Professional", todayMatches: 1 },
-  { id: "p4", name: "Dave", state: "standby", image: "/next.svg", rank: 4, team: 2, level: "Professional", todayMatches: 1 },
-  { id: "p5", name: "Eve", state: "ready", image: "/next.svg", rank: 5, team: 2, level: "Professional", todayMatches: 0 },
-  // Intermediate (green)
-  { id: "p6", name: "Frank", state: "ready", image: "/next.svg", rank: 6, team: 1, level: "Intermediate", todayMatches: 1 },
-  { id: "p7", name: "Grace", state: "standby", image: "/next.svg", rank: 7, team: 1, level: "Intermediate", todayMatches: 0 },
-  { id: "p8", name: "Heidi", state: "ready", image: "/next.svg", rank: 8, team: 2, level: "Intermediate", todayMatches: 1 },
-  { id: "p9", name: "Ivan", state: "standby", image: "/next.svg", rank: 9, team: 2, level: "Intermediate", todayMatches: 2 },
-  { id: "p10", name: "Judy", state: "ready", image: "/next.svg", rank: 10, team: 2, level: "Intermediate", todayMatches: 0 },
-  { id: "p11", name: "Ken", state: "ready", image: "/next.svg", rank: 11, team: 1, level: "Intermediate", todayMatches: 1 },
-  { id: "p12", name: "Liam", state: "standby", image: "/next.svg", rank: 12, team: 1, level: "Intermediate", todayMatches: 0 },
-  { id: "p13", name: "Mona", state: "ready", image: "/next.svg", rank: 13, team: 2, level: "Intermediate", todayMatches: 1 },
-  { id: "p14", name: "Nina", state: "standby", image: "/next.svg", rank: 14, team: 2, level: "Intermediate", todayMatches: 0 },
-  { id: "p15", name: "Oscar", state: "ready", image: "/next.svg", rank: 15, team: 2, level: "Intermediate", todayMatches: 0 },
-  // Beginner (blue)
-  { id: "p16", name: "Paul", state: "ready", image: "/next.svg", rank: 16, team: 1, level: "Beginner", todayMatches: 1 },
-  { id: "p17", name: "Quinn", state: "standby", image: "/next.svg", rank: 17, team: 1, level: "Beginner", todayMatches: 0 },
-  { id: "p18", name: "Rita", state: "ready", image: "/next.svg", rank: 18, team: 2, level: "Beginner", todayMatches: 0 },
-  { id: "p19", name: "Sam", state: "standby", image: "/next.svg", rank: 19, team: 2, level: "Beginner", todayMatches: 1 },
-  { id: "p20", name: "Tina", state: "ready", image: "/next.svg", rank: 20, team: 2, level: "Beginner", todayMatches: 0 },
-  // Unknown (grey)
-  { id: "p21", name: "Uma", state: "ready", image: "/next.svg", rank: 21, team: 1, level: "Unknown", todayMatches: 1 },
-  { id: "p22", name: "Vince", state: "standby", image: "/next.svg", rank: 22, team: 1, level: "Unknown", todayMatches: 0 },
-  { id: "p23", name: "Wendy", state: "ready", image: "/next.svg", rank: 23, team: 2, level: "Unknown", todayMatches: 0 },
-  { id: "p24", name: "Xander", state: "standby", image: "/next.svg", rank: 24, team: 2, level: "Unknown", todayMatches: 0 },
-  { id: "p25", name: "Yara", state: "ready", image: "/next.svg", rank: 25, team: 2, level: "Unknown", todayMatches: 0 },
+  // Professional Level Players (Rank 1-8)
+  { id: "p001", name: "Sarah Chen", state: "ready", image: "/next.svg", rank: 1, level: "Professional", todayMatches: 1, lastPlayTime: new Date(Date.now() - 2 * 60 * 60 * 1000) }, // 2 hours ago
+  { id: "p002", name: "David Kim", state: "ready", image: "/next.svg", rank: 2, level: "Professional", todayMatches: 2, lastPlayTime: new Date(Date.now() - 2 * 60 * 60 * 1000) }, // 2 hours ago
+  { id: "p003", name: "Emma Wilson", state: "ready", image: "/next.svg", rank: 3, level: "Professional", todayMatches: 1 },
+  { id: "p004", name: "James Park", state: "ready", image: "/next.svg", rank: 4, level: "Professional", todayMatches: 1 },
+  { id: "p005", name: "Rachel Torres", state: "standby", image: "/next.svg", rank: 5, level: "Professional", todayMatches: 0 },
+  { id: "p006", name: "Marcus Johnson", state: "ready", image: "/next.svg", rank: 6, level: "Professional", todayMatches: 0 },
+  { id: "p007", name: "Mike Rodriguez", state: "ready", image: "/next.svg", rank: 7, level: "Professional", todayMatches: 1 },
+  { id: "p008", name: "Nina Petrov", state: "standby", image: "/next.svg", rank: 8, level: "Professional", todayMatches: 1, lastPlayTime: new Date(Date.now() - 5 * 60 * 60 * 1000) }, // 5 hours ago
+
+  // Intermediate Level Players (Rank 9-18)
+  { id: "p009", name: "Kevin Chang", state: "ready", image: "/next.svg", rank: 9, level: "Intermediate", todayMatches: 0 },
+  { id: "p010", name: "Sophie Lee", state: "ready", image: "/next.svg", rank: 10, level: "Intermediate", todayMatches: 1, lastPlayTime: new Date(Date.now() - 6 * 60 * 60 * 1000) }, // 6 hours ago  
+  { id: "p011", name: "Carlos Martinez", state: "standby", image: "/next.svg", rank: 11, level: "Intermediate", todayMatches: 0 },
+  { id: "p012", name: "Lisa Zhang", state: "ready", image: "/next.svg", rank: 12, level: "Intermediate", todayMatches: 1 },
+  { id: "p013", name: "Ryan O'Connor", state: "ready", image: "/next.svg", rank: 13, level: "Intermediate", todayMatches: 0 },
+  { id: "p014", name: "Priya Sharma", state: "standby", image: "/next.svg", rank: 14, level: "Intermediate", todayMatches: 1, lastPlayTime: new Date(Date.now() - 4 * 60 * 60 * 1000) }, // 4 hours ago
+  { id: "p015", name: "Alex Thompson", state: "ready", image: "/next.svg", rank: 15, level: "Intermediate", todayMatches: 1 },
+  { id: "p016", name: "Maya Patel", state: "ready", image: "/next.svg", rank: 16, level: "Intermediate", todayMatches: 0 },
+  { id: "p017", name: "Jordan Smith", state: "standby", image: "/next.svg", rank: 17, level: "Intermediate", todayMatches: 2, lastPlayTime: new Date(Date.now() - 3 * 60 * 60 * 1000) }, // 3 hours ago
+  { id: "p018", name: "Amanda Foster", state: "ready", image: "/next.svg", rank: 18, level: "Intermediate", todayMatches: 0 },
+
+  // Beginner Level Players (Rank 19-26)
+  { id: "p019", name: "Ben Taylor", state: "ready", image: "/next.svg", rank: 19, level: "Beginner", todayMatches: 0 },
+  { id: "p020", name: "Tom Anderson", state: "ready", image: "/next.svg", rank: 20, level: "Beginner", todayMatches: 1 },
+  { id: "p021", name: "Jessica Brown", state: "standby", image: "/next.svg", rank: 21, level: "Beginner", todayMatches: 0 },
+  { id: "p022", name: "Maria Garcia", state: "ready", image: "/next.svg", rank: 22, level: "Beginner", todayMatches: 1 },
+  { id: "p023", name: "Daniel Miller", state: "ready", image: "/next.svg", rank: 23, level: "Beginner", todayMatches: 0 },
+  { id: "p024", name: "Ashley Davis", state: "standby", image: "/next.svg", rank: 24, level: "Beginner", todayMatches: 1, lastPlayTime: new Date(Date.now() - 7 * 60 * 60 * 1000) }, // 7 hours ago
+  { id: "p025", name: "Chris Wilson", state: "ready", image: "/next.svg", rank: 25, level: "Beginner", todayMatches: 0 },
+  { id: "p026", name: "Lauren Moore", state: "ready", image: "/next.svg", rank: 26, level: "Beginner", todayMatches: 0 },
+
+  // New/Unranked Players
+  { id: "p027", name: "Jake Roberts", state: "ready", image: "/next.svg", rank: 27, level: "Unknown", todayMatches: 0 },
+  { id: "p028", name: "Samantha Lee", state: "standby", image: "/next.svg", rank: 28, level: "Unknown", todayMatches: 0 },
+  { id: "p029", name: "Michael Chen", state: "ready", image: "/next.svg", rank: 29, level: "Unknown", todayMatches: 0 },
+  { id: "p030", name: "Anna Rodriguez", state: "ready", image: "/next.svg", rank: 30, level: "Unknown", todayMatches: 0 }
 ]
 
 export default function Dashboard() {
@@ -147,11 +160,21 @@ export default function Dashboard() {
 
   // Use state for courts so we can add/remove
   const [courts, setCourts] = useState<Court[]>(mockCourts)
-  // Add new court handler
+  // State for Add Court Modal
+  const [showAddCourtModal, setShowAddCourtModal] = useState(false)
+  
+  // Add new court handler - now opens modal
   const handleAddCourt = () => {
-    const newId = `c${courts.length + 1}`
-    setCourts([...courts, { id: newId, name: `Court ${courts.length + 1}`, status: "available" }])
+    setShowAddCourtModal(true)
   }
+  
+  // Handle court creation with custom name
+  const handleCreateCourt = (name: string) => {
+    const newId = `c${String(courts.length + 1).padStart(3, '0')}`
+    setCourts([...courts, { id: newId, name: name, status: "available" }])
+    setShowAddCourtModal(false)
+  }
+  
   // Remove court handler
   const handleRemoveCourt = (id: string) => {
     setCourts(courts.filter(c => c.id !== id))
@@ -159,13 +182,39 @@ export default function Dashboard() {
 
   // Use state for matches so we can add/assign
   const [matches, setMatches] = useState<Match[]>(mockMatches)
+  // Use state for players to track lastPlayTime
+  const [players, setPlayers] = useState<Player[]>(mockPlayers)
+  // State for Add Player Modal
+  const [showAddPlayerModal, setShowAddPlayerModal] = useState(false)
+  
   // Add new match handler
   const handleAddMatch = () => {
-    const newId = `${matches.length + 1}`
+    const newId = `m${String(matches.length + 1).padStart(3, '0')}`
     setMatches([
       ...matches,
-      { id: newId, name: `Match ${matches.length + 1}`, status: "Pending", players: [], court: null }
+      { id: newId, name: `New Match ${matches.length + 1}`, status: "Pending", players: [], court: null }
     ])
+  }
+
+  // Add new player handler - opens modal
+  const handleAddPlayer = () => {
+    setShowAddPlayerModal(true)
+  }
+  
+  // Handle player creation with custom name and level
+  const handleCreatePlayer = (name: string, level: string) => {
+    const newId = `p${String(players.length + 1).padStart(3, '0')}`
+    const newPlayer: Player = {
+      id: newId,
+      name: name,
+      state: "ready",
+      image: "/next.svg",
+      rank: players.length + 1,
+      level: level,
+      todayMatches: 0
+    }
+    setPlayers([...players, newPlayer])
+    setShowAddPlayerModal(false)
   }
 
   // Remove match handler
@@ -191,6 +240,8 @@ export default function Dashboard() {
   
   // End match handler - changes status to Ended, stamps end time, and releases players and court
   const handleEndMatch = (matchId: string) => {
+    const endTime = new Date()
+    
     setMatches(matches => matches.map(m => {
       if (m.id === matchId) {
         // Set court status back to available if there was a court assigned
@@ -199,10 +250,20 @@ export default function Dashboard() {
             c.id === m.court!.id ? { ...c, status: "available" } : c
           ))
         }
+        
+        // Update lastPlayTime for all players in this match
+        if (m.players.length > 0) {
+          setPlayers(players => players.map(p => 
+            m.players.some(mp => mp.id === p.id) 
+              ? { ...p, lastPlayTime: endTime }
+              : p
+          ))
+        }
+        
         return { 
           ...m, 
           status: "Ended", 
-          endTime: new Date(),
+          endTime: endTime,
           players: [], // Release all players back to available pool
           court: null  // Release court back to available pool
         }
@@ -223,11 +284,20 @@ export default function Dashboard() {
 
   // Helper: available players (not in any match)
   const assignedPlayerIds = new Set(matches.flatMap(m => m.players.map(p => p.id)))
-  const availablePlayers = mockPlayers.filter(p => 
-    !assignedPlayerIds.has(p.id) && 
-    playerFilters.includes(p.level || 'Unknown') &&
-    playerStateFilter.includes(p.state)
-  )
+  const availablePlayers = players
+    .filter(p => 
+      !assignedPlayerIds.has(p.id) && 
+      playerFilters.includes(p.level || 'Unknown') &&
+      playerStateFilter.includes(p.state)
+    )
+    .sort((a, b) => {
+      // Sort by lastPlayTime in descending order (most recent first)
+      // Players with no lastPlayTime go to the end
+      if (!a.lastPlayTime && !b.lastPlayTime) return 0
+      if (!a.lastPlayTime) return 1
+      if (!b.lastPlayTime) return -1
+      return b.lastPlayTime.getTime() - a.lastPlayTime.getTime()
+    })
 
   // Group players by level
   const playersByLevel = availablePlayers.reduce((acc, player) => {
@@ -272,8 +342,12 @@ export default function Dashboard() {
   // Modal state for court selection
   const [courtModalMatchId, setCourtModalMatchId] = useState<string | null>(null)
 
-  // Helper: available courts (not assigned to any match)
-  const assignedCourtIds = new Set(matches.filter(m => m.court).map(m => m.court!.id))
+  // Helper: available courts (not assigned to any ongoing match)
+  const assignedCourtIds = new Set(
+    matches
+      .filter(m => m.court && m.status === 'Ongoing') // Only ongoing matches
+      .map(m => m.court!.id)
+  )
   const availableCourts = courts.filter(c => c.status === 'available' && !assignedCourtIds.has(c.id))
 
   // Assign court from modal
@@ -317,6 +391,23 @@ export default function Dashboard() {
           onSelectPlayer={handleSelectPlayer}
           onClose={() => setPlayerModal(null)}
           columns={3}
+        />
+      )}
+      {/* Modal for adding new court */}
+      {showAddCourtModal && (
+        <AddCourtModal
+          onAddCourt={handleCreateCourt}
+          onClose={() => setShowAddCourtModal(false)}
+          existingCourtNames={courts.map(court => court.name)}
+        />
+      )}
+      
+      {/* Modal for adding new player */}
+      {showAddPlayerModal && (
+        <AddPlayerModal
+          onAddPlayer={handleCreatePlayer}
+          onClose={() => setShowAddPlayerModal(false)}
+          existingPlayerNames={players.map(player => player.name)}
         />
       )}
       {/* Main container */}
@@ -446,17 +537,19 @@ export default function Dashboard() {
               Available Players
             </h3>
             
-            {/* Player Statistics */}
-            <div className="flex items-center gap-4 text-sm">
+            <div className="flex items-center gap-4">
+              {/* Player Statistics */}
               <div className="bg-gradient-to-r from-indigo-100 to-blue-100 rounded-lg px-4 py-2 border border-indigo-200">
                 <span className="font-semibold text-indigo-700">Total: {playerStats.total}</span>
               </div>
-              <div className="bg-gradient-to-r from-green-100 to-emerald-100 rounded-lg px-4 py-2 border border-green-200">
-                <span className="font-semibold text-green-700">Ready: {playerStats.ready}</span>
-              </div>
-              <div className="bg-gradient-to-r from-yellow-100 to-amber-100 rounded-lg px-4 py-2 border border-yellow-200">
-                <span className="font-semibold text-yellow-700">Standby: {playerStats.standby}</span>
-              </div>
+              
+              {/* Add Player Button */}
+              <button 
+                onClick={handleAddPlayer} 
+                className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 btn-3d"
+              >
+                Add Player
+              </button>
             </div>
           </div>
           
@@ -602,7 +695,7 @@ export default function Dashboard() {
             <div className="bg-gray-50 rounded-lg p-4 shadow-sm flex flex-col gap-2">
               <div className="font-semibold text-base mb-1">Courts Management</div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {mockCourts.map(court => (
+                {courts.map(court => (
                   <div key={court.id} className="border border-gray-200 rounded-lg p-2 flex flex-col gap-1 bg-white">
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-blue-700 text-sm">{court.name}</span>
@@ -610,7 +703,12 @@ export default function Dashboard() {
                     </div>
                     <div className="flex gap-1 mt-1">
                       <button className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-xs font-medium hover:bg-blue-100 transition">Edit</button>
-                      <button className="bg-red-50 text-red-700 px-2 py-0.5 rounded text-xs font-medium hover:bg-red-100 transition">Delete</button>
+                      <button 
+                        onClick={() => handleRemoveCourt(court.id)}
+                        className="bg-red-50 text-red-700 px-2 py-0.5 rounded text-xs font-medium hover:bg-red-100 transition"
+                      >
+                        Delete
+                      </button>
                       {court.status === 'occupied' && (
                         <Link href="/match/1" className="bg-green-50 text-green-700 px-2 py-0.5 rounded text-xs font-medium hover:bg-green-100 transition">View</Link>
                       )}
@@ -618,7 +716,12 @@ export default function Dashboard() {
                   </div>
                 ))}
               </div>
-              <button className="mt-2 bg-blue-600 text-white px-3 py-1.5 rounded text-sm font-medium hover:bg-blue-700 transition self-start">Add Court</button>
+              <button 
+                onClick={handleAddCourt}
+                className="mt-2 bg-blue-600 text-white px-3 py-1.5 rounded text-sm font-medium hover:bg-blue-700 transition self-start"
+              >
+                Add Court
+              </button>
             </div>
             {/* List of Players in Ready and Standby */}
             <div className="bg-gray-50 rounded-lg p-4 shadow-sm flex flex-col gap-2">
@@ -626,7 +729,7 @@ export default function Dashboard() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <div className="font-medium text-green-700 mb-1 text-sm">Ready</div>
-                  {mockPlayers.filter(p => p.state === 'ready').map(p => (
+                  {players.filter(p => p.state === 'ready').map(p => (
                     <div key={p.id} className="flex items-center gap-2 justify-between bg-white border border-gray-200 rounded px-2 py-1 mb-1">
                       <span className="text-sm">{p.name}</span>
                       <div className="flex gap-1">
@@ -638,7 +741,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <div className="font-medium text-yellow-700 mb-1 text-sm">Standby</div>
-                  {mockPlayers.filter(p => p.state === 'standby').map(p => (
+                  {players.filter(p => p.state === 'standby').map(p => (
                     <div key={p.id} className="flex items-center gap-2 justify-between bg-white border border-gray-200 rounded px-2 py-1 mb-1">
                       <span className="text-sm">{p.name}</span>
                       <div className="flex gap-1">

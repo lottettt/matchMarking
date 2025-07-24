@@ -66,7 +66,7 @@ const PlayerModal: React.FC<PlayerModalProps> = ({ matchId, team, slotIdx, avail
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm p-4">
-      <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-white/30 animate-fade-in">
+      <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-5xl w-full max-h-[95vh] overflow-hidden border border-white/30 animate-fade-in">
         {/* Header */}
         <div className="bg-gradient-to-r from-indigo-500 to-blue-500 p-6 text-white">
           <div className="flex items-center justify-between">
@@ -172,7 +172,7 @@ const PlayerModal: React.FC<PlayerModalProps> = ({ matchId, team, slotIdx, avail
         </div>
 
         {/* Players List */}
-        <div className="p-6 overflow-y-auto max-h-96">
+        <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(95vh - 280px)' }}>
           {filteredPlayers.length === 0 ? (
             <div className="text-center py-12">
               <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
@@ -198,31 +198,75 @@ const PlayerModal: React.FC<PlayerModalProps> = ({ matchId, team, slotIdx, avail
                       {players.length}
                     </span>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                     {players.map(player => {
                       const statusInfo = getStateIcon(player.state)
+                      
+                      // Calculate minutes since last play
+                      const getLastPlayText = (lastPlayTime?: Date) => {
+                        if (!lastPlayTime) return 'Never played'
+                        
+                        const now = new Date()
+                        const diffMs = now.getTime() - lastPlayTime.getTime()
+                        const diffMinutes = Math.floor(diffMs / (1000 * 60))
+                        
+                        if (diffMinutes < 1) return 'Just finished'
+                        if (diffMinutes < 60) return `${diffMinutes} min ago`
+                        
+                        const diffHours = Math.floor(diffMinutes / 60)
+                        const remainingMinutes = diffMinutes % 60
+                        
+                        if (diffHours < 24) {
+                          return remainingMinutes > 0 
+                            ? `${diffHours}h ${remainingMinutes}m ago`
+                            : `${diffHours}h ago`
+                        }
+                        
+                        const diffDays = Math.floor(diffHours / 24)
+                        return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`
+                      }
+                      
                       return (
                         <button 
                           key={player.id} 
                           onClick={() => onSelectPlayer(matchId, team, slotIdx, player)}
-                          className={`p-4 rounded-xl border-2 transition-all duration-200 text-left hover:shadow-lg hover:scale-105 transform relative ${getLevelColor(player.level)}`}
+                          className={`group p-4 rounded-xl border-2 transition-all duration-300 text-left hover:shadow-lg hover:scale-[1.02] transform relative overflow-hidden ${getLevelColor(player.level)}`}
                         >
-                          {/* Status badge in top right */}
-                          <div className={`absolute top-2 right-2 w-6 h-6 ${statusInfo.bgColor} ${statusInfo.textColor} rounded-md flex items-center justify-center text-xs font-bold shadow-sm`}>
+                          {/* Background decoration */}
+                          <div className="absolute top-0 right-0 w-16 h-16 opacity-10 transform translate-x-4 -translate-y-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-full h-full">
+                              <path d="M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                              <path fillRule="evenodd" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          
+                          {/* Status badge */}
+                          <div className={`absolute top-2 right-2 w-6 h-6 ${statusInfo.bgColor} ${statusInfo.textColor} rounded-lg flex items-center justify-center text-xs font-bold shadow-md border border-white/50 group-hover:scale-110 transition-transform duration-200`}>
                             {statusInfo.letter}
                           </div>
                           
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-white/80 rounded-full flex items-center justify-center text-lg font-bold shadow-sm">
-                              {player.name.charAt(0)}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="font-semibold text-sm truncate">{player.name}</div>
-                              <div className="text-xs text-gray-600 mt-1">
-                                Today: {player.todayMatches || 0} match{(player.todayMatches || 0) !== 1 ? 'es' : ''}
+                          <div className="mt-4 space-y-2">
+                            {/* Player Avatar and Name */}
+                            <div className="flex items-center gap-3">
+                              <div className="relative">
+                                <div className="w-10 h-10 bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm rounded-lg flex items-center justify-center text-base font-bold shadow-md border border-white/50 group-hover:scale-110 transition-transform duration-200">
+                                  {player.name.charAt(0)}
+                                </div>
+                                {/* Online indicator */}
+                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 border-2 border-white rounded-full shadow-sm"></div>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h6 className="font-bold text-sm truncate mb-1 group-hover:text-opacity-90">{player.name}</h6>
+                                <div className="text-xs text-gray-600 space-y-0.5">
+                                  <div>Today: {player.todayMatches || 0} match{(player.todayMatches || 0) !== 1 ? 'es' : ''}</div>
+                                  <div>Last play: {getLastPlayText(player.lastPlayTime)}</div>
+                                </div>
                               </div>
                             </div>
                           </div>
+                          
+                          {/* Hover effect overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                         </button>
                       )
                     })}
